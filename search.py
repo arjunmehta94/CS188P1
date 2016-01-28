@@ -93,6 +93,7 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    return graphSearch(problem, bfsStrategy)
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
@@ -137,7 +138,7 @@ def graphSearch(problem, strategy):
             closedSet.add(node)
             listOfSuccessors = problem.getSuccessors(node) #expanding node
             for successor in listOfSuccessors:
-                newItem = dfsStrategy(item, successor)
+                newItem = strategy(item, successor)
                 fringe.push(newItem, newItem['priority'])
     return []
 
@@ -146,4 +147,10 @@ def dfsStrategy(item, successor):
     (nextNode, action, cost) = successor
     currentPriority = item['priority']
     newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority - 1}
+    return newItem
+
+def bfsStrategy(item, successor):
+    (nextNode, action, cost) = successor
+    currentPriority = item['priority']
+    newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority + 1}
     return newItem
