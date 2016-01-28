@@ -87,6 +87,7 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    return graphSearch(problem, dfsStrategy)
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
@@ -117,3 +118,32 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+
+# Graph Search Method
+# Returns a list of actions based on strategy
+def graphSearch(problem, strategy):
+    closedSet = set()
+    fringe = util.PriorityQueue()
+    item = {'node' : problem.getStartState(), 'actions' : [], 'priority' : 0}
+    fringe.push(item, 0)
+    while not fringe.isEmpty():
+        item = fringe.pop()
+        #print item
+        node = item['node']
+        #print node
+        if problem.isGoalState(node):
+            return item['actions'] # return list of actions
+        if node not in closedSet:
+            closedSet.add(node)
+            listOfSuccessors = problem.getSuccessors(node) #expanding node
+            for successor in listOfSuccessors:
+                newItem = dfsStrategy(item, successor)
+                fringe.push(newItem, newItem['priority'])
+    return []
+
+# strategy for DFS
+def dfsStrategy(item, successor):
+    (nextNode, action, cost) = successor
+    currentPriority = item['priority']
+    newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority - 1}
+    return newItem
