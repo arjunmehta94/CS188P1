@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import searchAgents
 
 class SearchProblem:
     """
@@ -112,6 +113,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    return graphSearch(problem, aStarStrategy, searchAgents.manhattanHeuristic)
     util.raiseNotDefined()
 
 
@@ -123,7 +125,7 @@ ucs = uniformCostSearch
 
 # Graph Search Method
 # Returns a list of actions based on strategy
-def graphSearch(problem, strategy):
+def graphSearch(problem, strategy, heuristic=nullHeuristic):
     closedSet = set()
     fringe = util.PriorityQueue()
     item = {'node' : problem.getStartState(), 'actions' : [], 'priority' : 0}
@@ -139,26 +141,40 @@ def graphSearch(problem, strategy):
             closedSet.add(node)
             listOfSuccessors = problem.getSuccessors(node) #expanding node
             for successor in listOfSuccessors:
-                newItem = strategy(item, successor, problem)
+                newItem = strategy(item, successor, problem, heuristic)
                 fringe.push(newItem, newItem['priority'])
     return []
 
 # strategy for DFS
-def dfsStrategy(item, successor, problem):
+def dfsStrategy(item, successor, problem, heuristic):
     (nextNode, action, cost) = successor
     currentPriority = item['priority']
     newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority - 1}
     return newItem
 
 # strategy for BFS
-def bfsStrategy(item, successor, problem):
+def bfsStrategy(item, successor, problem, heuristic):
     (nextNode, action, cost) = successor
     currentPriority = item['priority']
     newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority + 1}
     return newItem
 
 # strategy for ucs
-def ucsStrategy(item, successor, problem):
+def ucsStrategy(item, successor, problem, heuristic):
     (nextNode, action, cost) = successor
-    newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : problem.getCostOfActions(item['actions'] + [action])}
+    newActionsList = item['actions'] + [action]
+    newCost = problem.getCostOfActions(newActionsList)
+    newItem = {'node' : nextNode, 'actions' : newActionsList, 'priority' : newCost}
     return newItem
+
+# strategy for A*
+def aStarStrategy(item, successor, problem, heuristic):
+    (nextNode, action, cost) = successor
+    newActionsList = item['actions'] + [action]
+    newCost = problem.getCostOfActions(newActionsList) + heuristic(nextNode, problem)
+    newItem = {'node' : nextNode, 'actions' : newActionsList, 'priority' : newCost}
+    return newItem
+
+
+
+
