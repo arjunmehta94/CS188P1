@@ -93,7 +93,9 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    return graphSearch(problem, bfsStrategy)
+    actions = graphSearch(problem, bfsStrategy)
+    print actions
+    return actions
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
@@ -134,13 +136,18 @@ def graphSearch(problem, strategy, heuristic=nullHeuristic):
         #print item
         node = item['node']
         #print node
+        print "Fringe: " + str(fringe)
         if problem.isGoalState(node):
+            #print item['action']
+            print "here"
             return item['actions'] # return list of actions
         if node not in closedSet:
             closedSet.add(node)
             listOfSuccessors = problem.getSuccessors(node) #expanding node
+            print listOfSuccessors
             for successor in listOfSuccessors:
                 newItem = strategy(item, successor, problem, heuristic)
+                print newItem
                 fringe.push(newItem, newItem['priority'])
     return []
 
