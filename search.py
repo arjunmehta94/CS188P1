@@ -99,6 +99,7 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    return graphSearch(problem, ucsStrategy)
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -138,19 +139,26 @@ def graphSearch(problem, strategy):
             closedSet.add(node)
             listOfSuccessors = problem.getSuccessors(node) #expanding node
             for successor in listOfSuccessors:
-                newItem = strategy(item, successor)
+                newItem = strategy(item, successor, problem)
                 fringe.push(newItem, newItem['priority'])
     return []
 
 # strategy for DFS
-def dfsStrategy(item, successor):
+def dfsStrategy(item, successor, problem):
     (nextNode, action, cost) = successor
     currentPriority = item['priority']
     newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority - 1}
     return newItem
 
-def bfsStrategy(item, successor):
+# strategy for BFS
+def bfsStrategy(item, successor, problem):
     (nextNode, action, cost) = successor
     currentPriority = item['priority']
     newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : currentPriority + 1}
+    return newItem
+
+# strategy for ucs
+def ucsStrategy(item, successor, problem):
+    (nextNode, action, cost) = successor
+    newItem = {'node' : nextNode, 'actions' : item['actions'] + [action], 'priority' : problem.getCostOfActions(item['actions'] + [action])}
     return newItem
