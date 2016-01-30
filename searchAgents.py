@@ -288,8 +288,8 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.currentState = self.startingPosition
-        self.goalList = list(self.corners)
+        #self.currentState = [self.startingPosition, list(self.corners)]
+        #self.goalList = list(self.corners)
 
     def getStartState(self):
         """
@@ -297,7 +297,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.startingPosition
+        return [self.startingPosition, list(self.corners)]
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -305,9 +305,9 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        if state in self.goalList:
-            self.goalList.remove(state)
-        return self.goalList == []
+        # if state in self.goalList:
+        #     self.goalList.remove(state)
+        return len(state[1]) == 0
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -331,16 +331,17 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            self.currentState = state
-            
-            x, y = state
+            #self.currentState = state
+            x, y = state[0][0], state[0][1]
+            currentStateList = list(state[1])
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
             if not hitsWall:
-                successors.append(((nextx, nexty), action, 1))
+                if (nextx, nexty) in currentStateList:
+                    currentStateList.remove((nextx,nexty))
+                successors.append(([(nextx, nexty),currentStateList], action, 1))
         self._expanded += 1 # DO NOT CHANGE
-        #print successors
         return successors
 
     def getCostOfActions(self, actions):

@@ -94,7 +94,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     actions = graphSearch(problem, bfsStrategy)
-    print actions
+    #print actions
     return actions
     util.raiseNotDefined()
 
@@ -127,27 +127,20 @@ ucs = uniformCostSearch
 # Graph Search Method
 # Returns a list of actions based on strategy
 def graphSearch(problem, strategy, heuristic=nullHeuristic):
-    closedSet = set()
+    closedSet = []
     fringe = util.PriorityQueue()
     item = {'node' : problem.getStartState(), 'actions' : [], 'priority' : 0}
     fringe.push(item, 0)
     while not fringe.isEmpty():
         item = fringe.pop()
-        #print item
         node = item['node']
-        #print node
-        print "Fringe: " + str(fringe)
         if problem.isGoalState(node):
-            #print item['action']
-            print "here"
             return item['actions'] # return list of actions
         if node not in closedSet:
-            closedSet.add(node)
+            closedSet.append(node)
             listOfSuccessors = problem.getSuccessors(node) #expanding node
-            print listOfSuccessors
             for successor in listOfSuccessors:
                 newItem = strategy(item, successor, problem, heuristic)
-                print newItem
                 fringe.push(newItem, newItem['priority'])
     return []
 
