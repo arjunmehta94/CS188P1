@@ -250,6 +250,11 @@ class StayWestSearchAgent(SearchAgent):
         costFn = lambda pos: 2 ** pos[0]
         self.searchType = lambda state: PositionSearchProblem(state, costFn)
 
+def manhattanHeuristicCorners(currentPosition, goalPosition):
+    xy1 = currentPosition
+    xy2 = goalPosition
+    return  abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
 def manhattanHeuristic(position, problem, info={}):
     "The Manhattan distance heuristic for a PositionSearchProblem"
     xy1 = position
@@ -375,7 +380,13 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    if problem.isGoalState(state):
+        return 0
+    value = []
+    cornersList = state[1]
+    for pos in cornersList:
+        value.append(manhattanHeuristicCorners(state[0],pos))
+    return max(value) # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
