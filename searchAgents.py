@@ -479,8 +479,18 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    foodGridCount = foodGrid.count()
+    if foodGridCount == 0:
+        return 0
     "*** YOUR CODE HERE ***"
-    return 0
+    # if 'originalFoodCount' not in problem.heuristicInfo:
+    #     problem.heuristicInfo['originalFoodCount'] = foodGridCount
+    #scalingFactor = float(foodGridCount)/float(problem.heuristicInfo['originalFoodCount'])
+    foodPosList = foodGrid.asList()
+    distList = []
+    for pos in foodPosList:
+        distList.append(manhattanHeuristicCorners(position,pos))
+    return max(distList)#/scalingFactor
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
