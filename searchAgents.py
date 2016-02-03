@@ -267,6 +267,12 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
+def euclideanHeuristic2(currentPosition, goalPosition):
+    "The Euclidean distance heuristic for a PositionSearchProblem"
+    xy1 = currentPosition
+    xy2 = goalPosition
+    return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
 #####################################################
 # This portion is incomplete.  Time to write code!  #
 #####################################################
@@ -480,19 +486,84 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     foodGridCount = foodGrid.count()
+    walls = problem.walls
     if foodGridCount == 0:
         return 0
-    "*** YOUR CODE HERE ***"
-    if 'originalFoodCount' not in problem.heuristicInfo:
-        problem.heuristicInfo['originalFoodCount'] = foodGridCount
-    scalingFactor = float(foodGridCount)/float(problem.heuristicInfo['originalFoodCount'])
-    # print scalingFactor
     foodPosList = foodGrid.asList()
     distList = []
     for pos in foodPosList:
-        distList.append(manhattanHeuristicCorners(position,pos))
-    #print distList
+        x1,y1 = position
+        x2,y2 = pos
+        wallsValue = 0
+        if isSameLineCheck(position, pos):
+            if x1 == x2:
+                wallsValue = verticalLineSearch(position, pos, walls)
+            elif y1 == y2:
+                wallsValue = horizontalLineSearch(position, pos, walls)
+            elif abs(x2 - x1) == abs(y2 - y1):
+                wallsValue = diagonalLineSearch(position, pos, walls)
+        distList.append(max(manhattanHeuristicCorners(position,pos), 4*wallsValue))
     return max(distList)
+
+# checks if 2 points are in same vertical, horizontal or diagonal line
+def isSameLineCheck(point1, point2):
+    x1, y1 = point1
+    x2, y2 = point2
+    return x1 == x2 or y1 == y2 or abs(x2 - x1) == abs(y2 - y1)
+
+# when x1 = x2
+def verticalLineSearch(point1, point2, walls):
+    x1, y1 = point1
+    x2, y2 = point2
+    if y2 < y1:
+        return countCheckVertical(x1, y1, y2, walls)
+    else:
+        return countCheckVertical(x1, y2, y1, walls)
+
+# when y1 = y2
+def horizontalLineSearch(point1, point2, walls):
+    x1, y1 = point1
+    x2, y2 = point2
+    if x2 < x1:
+        return countCheckHorizontal(y1, x1, x2, walls)
+    else:
+        return countCheckHorizontal(y1, x2, x1, walls)
+
+# when abs(y2 - y1) = abs(x2 - x1)
+def diagonalLineSearch(point1, point2, walls):
+    x1, y1 = point1
+    x2, y2 = point2
+    if y2 < y1:
+        if x2 < x1:
+            return countDiagonalCheck(x1, x2, y2, walls)
+        elif x1 < x2:
+            return countDiagonalCheck(x2, x1, y2, walls)
+    else:
+        if x2 < x1:
+            return countDiagonalCheck(x1, x2, y1, walls)
+        elif x1 < x2:
+            return countDiagonalCheck(x2, x1, y1, walls)
+
+def countCheckHorizontal(y, x1, x2, walls):
+    count = 0
+    for i in range(1, x1 - x2):
+            if walls[x2 + i][y]:
+                count += 1
+    return count 
+
+def countDiagonalCheck(x1, x2, y, walls):
+    count = 0
+    for x in range(1, x1 - x2):
+        if walls[x2 + x][y + x]:
+            count += 1
+    return count
+
+def countCheckVertical(x, y1, y2, walls):
+    count = 0
+    for i in range(1, y1 - y2):
+            if walls[x][y2 + i]:
+                count += 1
+    return count 
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
